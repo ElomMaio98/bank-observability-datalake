@@ -1,10 +1,9 @@
 from connectors.kafka_conector import KafkaConector
-from kafka import KafkaProducer
-
-
+import os
 
 class Producer:
     def __init__(self):
-        conector = KafkaConector()
-        conector.producer
-        self.conector = conector
+        self.conector = KafkaConector()
+    def produce(self, message):
+        producer = self.conector.producer
+        producer.send(topic=os.getenv('KAFKA_TOPIC'), value=message)

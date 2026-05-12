@@ -34,6 +34,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_JMX_PORT: 9997
       KAFKA_JMX_HOSTNAME: kafka
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
     healthcheck:
       test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
       interval: 10s
@@ -122,6 +123,27 @@ services:
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 4
     restart: always
+
+  producer:
+    build: .
+    container_name: producer
+    env_file:
+      - .env
+    command: python /app/src/producer/main.py
+    depends_on:
+      kafka:
+        condition: service_healthy
+      
+
+  consumer:
+    build: .
+    container_name: consumer
+    env_file:
+      - .env
+    command: python /app/src/consumer/main.py
+    depends_on:
+      - kafka
+      - elasticsearch
 
 volumes:
   es_data:
